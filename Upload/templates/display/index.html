@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+ 
+<body>
+        {% block content %}
+    <label for="categories">Categories</label>
+    <select name="categories" id="categories" onfocus="this.selectedIndex=-1;">
+        {% for cat in categories %}
+            <option value="{{cat.category}}"> {{cat.category}}</option>
+        {% endfor %}
+    </select>
+    <select name="subcategory" id="subcategory" onfocus="this.selectedIndex=-1;" hidden=true></select>
+    <select name="template" id="template" onfocus="this.selectedIndex=-1;" hidden=true></select>
+
+   
+<script>
+    let select_cat=document.getElementById('categories');
+    let select_sc=document.getElementById('subcategory');
+    let select_templ=document.getElementById('template');
+    select_cat.onchange=function(){
+
+        cat=select_cat.value;
+        fecth_from='/get_subcat/'+cat;
+        fetch(fecth_from, {
+      headers : { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+       }
+
+    }).then(function(response){
+            response.json().then(function(data){
+               let optionHtml='';
+               for (let sc of data.subcategory){
+                   optionHtml+='<option value="'+sc.subcategory +'">'+sc.subcategory+'</option>';
+               }
+               select_sc.hidden = false;
+               select_sc.innerHTML=optionHtml;
+            });
+        });
+    }
+
+select_sc.onchange=function(){
+
+sc=select_sc.value;
+fecth_from='/get_template/'+sc;
+fetch(fecth_from, {
+headers : { 
+'Content-Type': 'application/json',
+'Accept': 'application/json'
+}
+
+}).then(function(response){
+    response.json().then(function(data){
+       let optionHtml='';
+       for (let templ of data.template){
+           optionHtml+='<option value="'+templ.template +'">'+templ.template+'</option>';
+       }
+       select_templ.hidden = false;
+       select_templ.innerHTML=optionHtml;
+    //console.log(data);
+    });
+});
+}
+
+</script>
+ {% endblock %}
+</body>

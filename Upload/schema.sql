@@ -1,0 +1,37 @@
+DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS post;
+DROP TABLE IF EXISTS main;
+DROP TABLE IF EXISTS user_permission;
+
+CREATE TABLE user (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    PASSWORD TEXT NOT NULL
+);
+CREATE TABLE main(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    author_id INTEGER NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    col1 TEXT NOT NULL,
+    col2 TEXT NOT NULL,
+    FOREIGN KEY (author_id) REFERENCES user(id)
+);
+
+
+
+CREATE TABLE user_permission(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    category TEXT NOT NULL,
+    subcategory TEXT,
+    template TEXT,
+    FOREIGN KEY (user_id) REFERENCES user(id)
+);
+
+CREATE TABLE template1(
+    col1 TEXT,
+    col2 TEXT,
+    col3 TEXT
+)
+
+
