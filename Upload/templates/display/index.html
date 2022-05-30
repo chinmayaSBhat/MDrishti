@@ -2,20 +2,27 @@
  
 <body>
         {% block content %}
-    <label for="categories">Categories</label>
+    <dev class="container">
+    </br>
+    <label for="categories" >Categories</label>
     <select name="categories" id="categories" onfocus="this.selectedIndex=-1;">
         {% for cat in categories %}
             <option value="{{cat.category}}"> {{cat.category}}</option>
         {% endfor %}
     </select>
+    <label for="sub-categories" hidden=true id="sub-category">Sub-Categories</label>
     <select name="subcategory" id="subcategory" onfocus="this.selectedIndex=-1;" hidden=true></select>
+    <label for="template" hidden=true id="templates">Template</label>
     <select name="template" id="template" onfocus="this.selectedIndex=-1;" hidden=true></select>
-
+    <div id="download_file"></div>
    
 <script>
     let select_cat=document.getElementById('categories');
     let select_sc=document.getElementById('subcategory');
     let select_templ=document.getElementById('template');
+    let download_templ=document.getElementById('download_file');
+
+
     select_cat.onchange=function(){
 
         cat=select_cat.value;
@@ -33,6 +40,7 @@
                    optionHtml+='<option value="'+sc.subcategory +'">'+sc.subcategory+'</option>';
                }
                select_sc.hidden = false;
+               document.getElementById('sub-category').hidden=false;
                select_sc.innerHTML=optionHtml;
             });
         });
@@ -55,12 +63,27 @@ headers : {
            optionHtml+='<option value="'+templ.template +'">'+templ.template+'</option>';
        }
        select_templ.hidden = false;
+       document.getElementById('templates').hidden=false;
        select_templ.innerHTML=optionHtml;
     //console.log(data);
     });
 });
 }
 
+
+
 </script>
+<script>
+    let select_temp=document.getElementById('template');
+    let download_temp=document.getElementById('download_file');
+    select_templ.onchange=function(){
+
+    let sc=select_temp.value.trim();
+    let t= '<a href={{url_for('display.download_file', template='') }}'+sc+'> download</a>';
+
+    download_templ.innerHTML=t;
+    }
+</script>
+</dev>
  {% endblock %}
 </body>

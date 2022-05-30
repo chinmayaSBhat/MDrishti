@@ -1,9 +1,10 @@
 from flask import(
-    Blueprint, flash, g, redirect, render_template, request, url_for, jsonify
+    Blueprint, flash, g, redirect, render_template, request, url_for, jsonify,send_file
 )
 from werkzeug.exceptions import abort
 from Upload.auth import login_required
 from Upload.db import get_db
+import pandas as pd 
 
 bp=Blueprint('display',__name__)
 
@@ -47,3 +48,18 @@ def get_template(sc):
         tempObj['template']=temp['template']
         templArr.append(tempObj)
     return jsonify({'template':templArr})
+
+@bp.route('/download_file/<template>', methods=['POST','GET'])
+@login_required
+def download_file(template):
+    db=get_db()
+    templates=(db.execute("SELECT * FROM pragma_table_info(?) ",(template,)).fetchall())
+    print(templates)
+    templArr=[]
+    for temp in templates:
+        templArr.append(temp[1])
+
+    data = pd.DataFrame([],columns=templArr)
+    data.to_excel('Upload/table_template/sample_data.xlsx', sheet_name='sheet1', index=False)
+
+    return send_file('table_template/sample_data.xlsx', as_attachment=True)
