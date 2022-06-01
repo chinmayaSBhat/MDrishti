@@ -12,18 +12,8 @@ bp=Blueprint('display',__name__)
 @login_required
 def index():
     db=get_db()
-    # subcat=request.form['subcategory']
-    # temp=request.form['template']
-    # if cat is None and subcat is None and temp is None:
     categories=db.execute('SELECT category FROM user_permission WHERE user_id=? AND subcategory IS NULL AND template IS NULL',(g.user['id'],)).fetchall()
     return render_template('display/index.html',categories=categories,subcategory=None, template=None)
-    # elif subcat is None and temp is None:
-    #     subcategory=db.execute('SELECT subcategory FROM user_permission WHERE user_id=? AND category=? AND template IS NULL',(g.user['id'],request.)).fetchall()
-    #     return render_template('display/index.html',categories=list(cat),subcategory=subcategory, template=None)
-    # else:
-    #     template=db.execute('SELECT template FROM user_permission WHERE user_id=? AND category=? AND subcategory=?')
-    #     return render_template('display/index.html',categories=cat,subcategory=subcat, template=template)
-
 
 @bp.route('/get_subcat/<category>', methods=['POST','GET'])
 @login_required
@@ -63,3 +53,16 @@ def download_file(template):
     data.to_excel('Upload/table_template/sample_data.xlsx', sheet_name='sheet1', index=False)
 
     return send_file('table_template/sample_data.xlsx', as_attachment=True)
+
+@bp.route('/upload_file/<template>', methods=['POST','GET'])
+@login_required
+def upload_file(template):
+    if request.method == 'POST':
+        file = request.files["file"]                    
+        if file:
+            df = pd.read_excel(file)
+            
+    #return render_template('display/index.html')
+    titles=pd.DataFrame([],columns=df.columns.values)
+    return render_template('display/file_content.html',tables=[df.to_html(index=None)],titles=[titles.to_html(classes='data',index=None)])
+

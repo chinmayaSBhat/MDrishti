@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    <h1> {% block title %} Edit data {% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    <!-- {% for title in titles %}
+            
+    {{ title|safe }}
+    {% endfor %} -->
+    {% for table in tables %}
+        
+        {{ table|safe }}
+    {% endfor %}
+
+{% endblock %}

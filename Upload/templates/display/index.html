@@ -1,89 +1,106 @@
 {% extends 'base.html' %}
- 
+
 <body>
-        {% block content %}
+    {% block content %}
     <dev class="container">
-    </br>
-    <label for="categories" >Categories</label>
-    <select name="categories" id="categories" onfocus="this.selectedIndex=-1;">
-        {% for cat in categories %}
-            <option value="{{cat.category}}"> {{cat.category}}</option>
-        {% endfor %}
-    </select>
-    <label for="sub-categories" hidden=true id="sub-category">Sub-Categories</label>
-    <select name="subcategory" id="subcategory" onfocus="this.selectedIndex=-1;" hidden=true></select>
-    <label for="template" hidden=true id="templates">Template</label>
-    <select name="template" id="template" onfocus="this.selectedIndex=-1;" hidden=true></select>
-    <div id="download_file"></div>
-   
-<script>
-    let select_cat=document.getElementById('categories');
-    let select_sc=document.getElementById('subcategory');
-    let select_templ=document.getElementById('template');
-    let download_templ=document.getElementById('download_file');
+        <form method="POST" enctype="multipart/form-data"
+            action="{{url_for('display.upload_file', template='template1')}}">
+            <label for="categories">Categories</label>
+            <select name="categories" id="categories" onfocus="this.selectedIndex=-1;">
+                {% for cat in categories %}
+                <option value="{{cat.category}}"> {{cat.category}}</option>
+                {% endfor %}
+            </select>
+        </br>
+            <label for="sub-categories" hidden=true id="sub-category">Sub-Categories</label>
+            <select name="subcategory" id="subcategory" onfocus="this.selectedIndex=-1;" hidden=true></select>
+        </br>
+            <label for="template" hidden=true id="templates">Template</label>
+            <select name="template" id="template" onfocus="this.selectedIndex=-1;" hidden=true></select>
+        </br>
+            <div id="download_file"></div>
+        </br>
+            <div id="upload_file" hidden=true>
+                <input type="file" name="file" id="file">
+            </br>
+                <input type="submit" value="submit">
+            </div>
+
+        </form>
+
+        <script>
+            let select_cat = document.getElementById('categories');
+            let select_sc = document.getElementById('subcategory');
+            let select_templ = document.getElementById('template');
+            let download_templ = document.getElementById('download_file');
 
 
-    select_cat.onchange=function(){
+            select_cat.onchange = function () {
 
-        cat=select_cat.value;
-        fecth_from='/get_subcat/'+cat;
-        fetch(fecth_from, {
-      headers : { 
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-       }
+                cat = select_cat.value;
+                fecth_from = '/get_subcat/' + cat;
+                fetch(fecth_from, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
 
-    }).then(function(response){
-            response.json().then(function(data){
-               let optionHtml='';
-               for (let sc of data.subcategory){
-                   optionHtml+='<option value="'+sc.subcategory +'">'+sc.subcategory+'</option>';
-               }
-               select_sc.hidden = false;
-               document.getElementById('sub-category').hidden=false;
-               select_sc.innerHTML=optionHtml;
-            });
-        });
-    }
+                }).then(function (response) {
+                    response.json().then(function (data) {
+                        let optionHtml = '';
+                        for (let sc of data.subcategory) {
+                            optionHtml += '<option value="' + sc.subcategory + '">' + sc.subcategory + '</option>';
+                        }
+                        select_sc.hidden = false;
+                        document.getElementById('sub-category').hidden = false;
+                        select_sc.innerHTML = optionHtml;
+                    });
+                });
+            }
 
-select_sc.onchange=function(){
+            select_sc.onchange = function () {
 
-sc=select_sc.value;
-fecth_from='/get_template/'+sc;
-fetch(fecth_from, {
-headers : { 
-'Content-Type': 'application/json',
-'Accept': 'application/json'
-}
+                sc = select_sc.value;
+                fecth_from = '/get_template/' + sc;
+                fetch(fecth_from, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
 
-}).then(function(response){
-    response.json().then(function(data){
-       let optionHtml='';
-       for (let templ of data.template){
-           optionHtml+='<option value="'+templ.template +'">'+templ.template+'</option>';
-       }
-       select_templ.hidden = false;
-       document.getElementById('templates').hidden=false;
-       select_templ.innerHTML=optionHtml;
-    //console.log(data);
-    });
-});
-}
+                }).then(function (response) {
+                    response.json().then(function (data) {
+                        let optionHtml = '';
+                        for (let templ of data.template) {
+                            optionHtml += '<option value="' + templ.template + '">' + templ.template + '</option>';
+                        }
+                        select_templ.hidden = false;
+                        document.getElementById('templates').hidden = false;
+                        select_templ.innerHTML = optionHtml;
+                        //console.log(data);
+                    });
+                });
+            }
 
 
 
-</script>
-<script>
-    let select_temp=document.getElementById('template');
-    let download_temp=document.getElementById('download_file');
-    select_templ.onchange=function(){
+        </script>
+        <script>
+            let select_temp = document.getElementById('template');
+            let download_temp = document.getElementById('download_file');
 
-    let sc=select_temp.value.trim();
-    let t= '<a href={{url_for('display.download_file', template='') }}'+sc+'> download</a>';
 
-    download_templ.innerHTML=t;
-    }
-</script>
-</dev>
- {% endblock %}
+            select_templ.onchange = function () {
+
+                let sc = select_temp.value.trim();
+                let t = '<a href={{url_for('display.download_file', template='') }}' + sc + '> download</a>';
+
+                download_templ.innerHTML = t;
+                document.getElementById("upload_file").hidden=false;
+            }
+
+
+        </script>
+    </dev>
+    {% endblock %}
 </body>
