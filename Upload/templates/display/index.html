@@ -3,8 +3,7 @@
 <body>
     {% block content %}
     <dev class="container">
-        <form method="POST" enctype="multipart/form-data"
-            action="{{url_for('display.upload_file', template='template1')}}">
+        <form method="POST" enctype="multipart/form-data" id="upload">
             <label for="categories">Categories</label>
             <select name="categories" id="categories" onfocus="this.selectedIndex=-1;">
                 {% for cat in categories %}
@@ -21,13 +20,12 @@
             <div id="download_file"></div>
         </br>
             <div id="upload_file" hidden=true>
-                <input type="file" name="file" id="file">
+                <input type="file" name="file" id="file" required>
             </br>
                 <input type="submit" value="submit">
             </div>
-
         </form>
-
+            
         <script>
             let select_cat = document.getElementById('categories');
             let select_sc = document.getElementById('subcategory');
@@ -93,10 +91,14 @@
             select_templ.onchange = function () {
 
                 let sc = select_temp.value.trim();
-                let t = '<a href={{url_for('display.download_file', template='') }}' + sc + '> download</a>';
+                let t = '<a href={{url_for('display.download_file', template='') }}' + sc + '> download</a> <hr>';
 
                 download_templ.innerHTML = t;
                 document.getElementById("upload_file").hidden=false;
+                let v='<br> <a href={{url_for('display.view_Data', template='') }}' + sc + '> View Data</a>';
+                document.getElementById("upload_file").hidden=false;
+                download_templ.innerHTML=t+v;
+                document.getElementById("upload").action='{{url_for('display.upload_file', template='')}}'+sc
             }
 
 

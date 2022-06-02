@@ -27,7 +27,6 @@ input[type=submit] { align-self: start; min-width: 10em; }
 table {
     width: 100% !important;
   }
-  
-  thead {
-    height: 70px !important;
-  }
+thead{
+  text-align: left;
+}

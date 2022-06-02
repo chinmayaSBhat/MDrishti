@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block header %}
-    <h1> {% block title %} Edit data {% endblock %}</h1>
+    <h1> {% block title %} View data {% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
-<form method="post" action="{{url_for('display.upload_file_data',template=template)}}">
+
     <table>
         <thead>
             {% for col in columns %}
@@ -16,14 +16,13 @@
             {% for row in data %}
                 <tr>
                     {% for cell in row %}
-                        <td><input name="{{columns[loop.index-1]}}" value="{{cell}}"></td>
+                        <td>{{cell}}</td>
                     {% endfor %}
                 </tr>
             {% endfor %}
         </tbody>
-        
-        <input type="submit" value="submit">
+
     </table>
-    </form>
+ 
 
 {% endblock %}
