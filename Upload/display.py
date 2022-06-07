@@ -44,12 +44,14 @@ def get_template(sc):
 def download_file(template):
     db=get_db()
     templates=(db.execute("SELECT * FROM pragma_table_info(?) ",(template,)).fetchall())
-    print(templates)
     templArr=[]
+    flg=0
     for temp in templates:
-        templArr.append(temp[1])
-
-    data = pd.DataFrame([],columns=templArr)
+        if flg!=0:
+            templArr.append(temp[1])
+        flg=1
+    flg=0
+    data = pd.DataFrame([],columns=templArr[1:])
     data.to_excel('Upload/table_template/sample_data.xlsx', sheet_name='sheet1', index=False)
 
     return send_file('table_template/sample_data.xlsx', as_attachment=True)
@@ -66,7 +68,6 @@ def upload_file(template):
     #return render_template('display/index.html')
     columns=tuple(df.columns.values)
     data=tuple(df.itertuples(index=False, name=None))
-    print("data", columns)
     return render_template('display/file_content.html',columns=columns,data=data, template=template)
 
 @bp.route('/upload_file_data/<template>', methods=['POST','GET'])
@@ -77,29 +78,20 @@ def upload_file_data(template):
     keys=[]
     values=[]
     if request.method=='POST':
-        for key in request.form.keys():
-            
+        for key in request.form.keys():           
             keys.append(key)
             values.append(request.form.getlist(key))
-            # for value in request.form.getlist(key):
-            #     print (key,":",value)
-            #     keys.append(key)
-            #     values.append(value)
         dict1=zip(keys,values)
         
     #print(dict(dict1))
     df=pd.DataFrame.from_dict(dict(dict1))
-    print(df)
     cols = ",".join([str(i) for i in df.columns.tolist()])
-    print("cols",cols)
-    print(template)
     query="INSERT INTO "+template+"  ("+cols+")" +"VALUES "
     print(query)
     for i,row in df.iterrows():
         print(tuple(row))
         q=query+str(tuple(row))
         print(q)
-        #sql = "INSERT INTO `book_details` (`" +cols + "`) VALUES (" + "%s,"*(len(row)-1) + "%s)"
         db.execute(q)
         db.commit()
             
@@ -117,4 +109,58 @@ def view_Data(template):
         templArr.append(temp[1])
     q='SELECT * FROM '+template
     d2d=db.execute(q).fetchall()
-    return render_template('display/view_data.html',columns=templArr,data=d2d)
+    return render_template('display/view_data.html',columns=templArr,data=d2d,template=template)
+
+
+def get_data(id, template):
+    q="SELECT * FROM "+template+" WHERE id="+str(id)
+    d=get_db().execute(q).fetchone()
+
+    if d is None:
+        abort(404, f"Content id {id} doesn't exist.")
+    return d
+
+
+@bp.route('/<template>/<int:id>/update', methods=('GET','POST'))
+@login_required
+def update(id,template):
+    db=get_db()
+    templates=(db.execute("SELECT * FROM pragma_table_info(?) ",(template,)).fetchall())
+    columns=[]
+    for temp in templates:
+        columns.append(temp[1])
+
+    d=get_data(id,template)
+    
+    post_data=[]
+    keys=[]
+    values=[]
+    if request.method=='POST':
+        for key in request.form.keys():           
+            keys.append(key)
+            values.append(request.form.getlist(key))
+        dict1=zip(keys,values)
+        df=pd.DataFrame.from_dict(dict(dict1))
+        cols = df.columns.tolist()
+        vals=df.iloc[0].tolist()
+        query="UPDATE "+ template+ " SET "
+        for i in range(len(cols)):
+            query+= cols[i]+"= '"+vals[i]+"', "
+        query=query[:-2]+" WHERE id="+str(id)
+        print(query)
+        db.execute(query)
+        db.commit()
+        return redirect(url_for('display.view_Data',template=template))
+    
+    return render_template('display/update.html',d=d,columns=columns,template=template )
+
+@bp.route('/<template>/<int:id>/delete', methods=('POST',))
+@login_required
+def delete(id,template):
+
+    db=get_db()
+    q="DELETE FROM "+template +" WHERE ID="+str(id)
+    print(q)
+    db.execute(q)
+    db.commit()
+    return redirect(url_for('display.view_Data',template=template))

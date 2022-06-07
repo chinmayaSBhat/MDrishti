@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block header %}
-    <h1> {% block title %} View data {% endblock %}</h1>
+    <h1> {% block title %} Data for {{template}} {% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
-
+    {% if data %}
     <table>
         <thead>
             {% for col in columns %}
@@ -16,13 +16,19 @@
             {% for row in data %}
                 <tr>
                     {% for cell in row %}
+                        
                         <td>{{cell}}</td>
                     {% endfor %}
+                    <td><a class="action" href="{{url_for('display.update', id=row['id'],template=template)}}">Update</a></td>
                 </tr>
             {% endfor %}
         </tbody>
 
     </table>
- 
+
+    {% else %}
+    <h4> No data Yet</h4>
+    {% endif %}
+    <a href="{{url_for('display.index')}}">Home</a>
 
 {% endblock %}
