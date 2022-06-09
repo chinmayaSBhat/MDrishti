@@ -45,13 +45,11 @@ def download_file(template):
     db=get_db()
     templates=(db.execute("SELECT * FROM pragma_table_info(?) ",(template,)).fetchall())
     templArr=[]
-    flg=0
     for temp in templates:
-        if flg!=0:
-            templArr.append(temp[1])
-        flg=1
-    flg=0
-    data = pd.DataFrame([],columns=templArr[1:])
+        templArr.append(temp[1])
+    templArr.remove('id')
+    data = pd.DataFrame([],columns=templArr)
+    print(data)
     data.to_excel('Upload/table_template/sample_data.xlsx', sheet_name='sheet1', index=False)
 
     return send_file('table_template/sample_data.xlsx', as_attachment=True)
@@ -64,10 +62,21 @@ def upload_file(template):
         file = request.files["file"]                    
         if file:
             df = pd.read_excel(file)
-            
+    db=get_db()
+    templates=(db.execute("SELECT * FROM pragma_table_info(?) ",(template,)).fetchall())
+    templArr=[]
+    for temp in templates:
+        templArr.append(temp[1])
+    templArr.remove('id')       
     #return render_template('display/index.html')
     columns=tuple(df.columns.values)
     data=tuple(df.itertuples(index=False, name=None))
+    print("cols:",columns)
+    print("temp",templArr )
+    if columns!=tuple(templArr):
+        flash("ERROR IN TEMPLATE")
+        return redirect(url_for('display.index'))
+
     return render_template('display/file_content.html',columns=columns,data=data, template=template)
 
 @bp.route('/upload_file_data/<template>', methods=['POST','GET'])
